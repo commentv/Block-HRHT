@@ -87,7 +87,7 @@ function main()
                  for p in procs(CDp_s)]
           [wait(r) for r in res]
           QUk_s = DArray(reshape(res, (1,length(procs(CDp_s)))))
-          B = multiply(diagm(S_s[1:k]), QUk_s)
+          B = multiply(diagm(S_s[1:k_tol]), QUk_s)
 
           res = [@spawnat p (CDp_g[:l]
                              * V_g[:,1:k]

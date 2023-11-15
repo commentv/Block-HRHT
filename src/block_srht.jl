@@ -282,7 +282,7 @@ function sketch_nystrom_cholesky(Ap::DArray{Float64,2}, l::Int, to::TimerOutput)
   return I(l), CDp
 end
 
-function sketch_nystrom(Ap::DArray{Float64,2}, l::Int, to::TimerOutput)::Tuple{Vector{Float64}, DArray{Float64,2}, Matrix{Float64}}
+function sketch_nystrom(Ap::DArray{Float64,2}, l::Int, to::TimerOutput)::Tuple{Vector{Float64}, DArray{Float64,2}, Matrix{Float64},Int64}
   (Pr,Pc) = size(procs(Ap))
 
   # Initialize global Random Number Generator
