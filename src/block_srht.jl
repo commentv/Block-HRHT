@@ -313,6 +313,6 @@ function sketch_nystrom(Ap::DArray{Float64,2}, l::Int, to::TimerOutput)::Tuple{V
   end
   close(Dp)
 
-  return S,CDp,V , k_tol
+  return S,CDp,V,k_tol
 end
 

@@ -69,7 +69,8 @@ function main()
     error_max = 0.0
     for i in 1:nb_exp
       local UtAU, UtA, B
-      @timeit to "srht l=$l" S_s,CDp_s, V_s = sketch_nystrom(A, l, to)
+      @timeit to "srht l=$l" S_s,CDp_s, V_s, k_tol = sketch_nystrom(A, l, to)
+      println("k_tol : $k_tol")
       @timeit to "gaussian l=$l" S_g, CDp_g, V_g = sketch_nystrom_gaussian(A, l, to)
       for k in ks
         if k <= l
@@ -81,8 +82,8 @@ function main()
                            "_height$(size(A)[1]).csv", "w")
 
           res = [@spawnat p (CDp_s[:l]
-                             * V_s[:,1:k]
-                             * Diagonal(1 ./ S_s[1:k]))'
+                             * V_s[:,1:k_tol]
+                             * Diagonal(1 ./ S_s[1:k_tol]))'
                  for p in procs(CDp_s)]
           [wait(r) for r in res]
           QUk_s = DArray(reshape(res, (1,length(procs(CDp_s)))))
