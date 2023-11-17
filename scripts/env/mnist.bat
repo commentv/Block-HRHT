@@ -1,15 +1,15 @@
-set BSRHT_MATRIX_FILE=mnist_780.txt
+set BHRHT_MATRIX_FILE=yearprediction_90.txt
 
-set BSRHT_SIGMA=100.0
+set BHRHT_SIGMA=100000.0
 
-set BSRHT_NBEXP=1
+set BHRHT_NBEXP=1
 
-set BSRHT_LS=[600,1000,2000]
+set BHRHT_LS=[600,1000,2000]
 
-set BSRHT_KS=200:100:600
+set BHRHT_KS=200:100:600
 
-set BSRHT_PRELOAD=false
+set BHRHT_PRELOAD=false
 
-set BSRHT_SEP=' '
+set BHRHT_SEP=' '
 
-set BSRHT_RPLC=true
+set BHRHT_RPLC=true

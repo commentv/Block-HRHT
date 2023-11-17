@@ -1,6 +1,6 @@
 include("tsqr.jl")
 @everywhere include("reduce.jl")
-@everywhere include("srht.jl")
+@everywhere include("hrht.jl")
 @everywhere using DistributedArrays
 @everywhere using TimerOutputs
 
@@ -11,7 +11,7 @@ Compute B = AΩ where A is a m×m column-distributed matrix
 
 A = [A1 ... Ap]
 
-and Ω is a m×l sketching matrix (see `srht()`)
+and Ω is a m×l sketching matrix (see `hrht()`)
 
 We must have l ≤ m/p
 """
@@ -28,7 +28,7 @@ function sketch_right(Ap::DArray{Float64,2}, l::Int, to::TimerOutput; global_see
   @timeit to "local" begin
     res = [@spawnat p begin
       Atp = permutedims(Ap[:l])
-      srht(Atp, l, to=to, global_seed=global_seed, block_seed=block_seeds[p_index])
+      hrht(Atp, l, to=to, global_seed=global_seed, block_seed=block_seeds[p_index])
     end for (p_index,p) in enumerate(ps)]
     [wait(r) for r in res]
     Atp_sketched::DArray{Float64,2} = DArray(reshape(res,(1,nps)))
@@ -50,7 +50,7 @@ Compute B = ΩA where A is a m×m row-distributed matrix
 
 A = [A1;...;Ap]
 
-and Ω is a l×m sketching matrix (see `srht()`)
+and Ω is a l×m sketching matrix (see `hrht()`)
 
 We must have l ≤ m/p
 """
@@ -67,7 +67,7 @@ function sketch_left end
   # Sketch each block: compute A_i Ω_i
   @info "$(now()) starting sketching ..."; flush(stdout)
   @timeit to "local" begin
-    res = [@spawnat p srht(Ap[:l], l, to=to, global_seed=seed) for p in ps]
+    res = [@spawnat p hrht(Ap[:l], l, to=to, global_seed=seed) for p in ps]
     [wait(r) for r in res]
     Ap_sketched::DArray{Float64,2} = DArray(reshape(res,(1,nps)))
   end
@@ -138,9 +138,9 @@ function sketch_2D_eachblock(Ap::DArray{Float64,2}, l::Tuple{Int,Int}, to::Timer
   @timeit to "local" begin
     res = [@spawnat p begin
              proc_coord = findall(x -> x == p, procs(A))[1]
-             temp = srht(Ap[:l], l[1], to=to, global_seed=left_seed, block_seed=left_seeds[proc_coord[1]])
+             temp = hrht(Ap[:l], l[1], to=to, global_seed=left_seed, block_seed=left_seeds[proc_coord[1]])
              temp = permutedims(temp)
-             srht(temp, l[2], to=to, global_seed=right_seed, block_seed=right_seeds[proc_coord[2]])
+             hrht(temp, l[2], to=to, global_seed=right_seed, block_seed=right_seeds[proc_coord[2]])
            end for p in ps]
     [wait(r) for r in res]
     Atp_sketched::DArray{Float64,2} = DArray(reshape(res,size(procs(Ap))))
@@ -208,7 +208,7 @@ function sketch_left_2D(Ap::DArray{Float64,2}, l::Int, to::TimerOutput; global_s
     res = [@spawnat p begin
              proc_coord::Tuple{Int,Int} = findall(x -> x == p, procs(Ap))[1]
              # D_i = Θ_i^t A_ij
-             srht(copy(localpart(Ap)), l, to=to,
+             hrht(copy(localpart(Ap)), l, to=to,
                              global_seed=global_seed,
                              block_seed=block_seeds[proc_coord[1]])
            end for p in ps]
